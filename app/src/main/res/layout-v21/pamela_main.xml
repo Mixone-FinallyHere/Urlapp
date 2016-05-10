@@ -53,17 +53,30 @@
             android:choiceMode="none"
             android:visibility="invisible" />
 
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center">
+
         <Button
             style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/refresh_button"
             android:background="@android:drawable/ic_popup_sync"
+            android:backgroundTint="#fd0000"
             android:alpha="0.5"
-            android:text="@string/refresh"
-            android:layout_gravity="left|center|right"
-            android:layout_marginTop="0dp"
             android:onClick="onClick" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/refresh"
+            android:id="@+id/textView" />
 
     </LinearLayout>
 

@@ -8,6 +8,8 @@
     <string name="pamela_error_view_content">The https request failed.</string>
     <string name="title_activity_agenda__side__menu">Agenda_Side_Menu</string>
 
+    <string name="refresh">Refresh</string>
+
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 </resources>

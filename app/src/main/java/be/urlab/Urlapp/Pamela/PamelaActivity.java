@@ -2,6 +2,7 @@ package be.urlab.Urlapp.Pamela;
 
 import android.animation.ObjectAnimator;
 import android.app.Activity;
+import android.os.Bundle;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.ListView;
@@ -25,7 +26,6 @@ import java.util.List;
 
 import be.urlab.Urlapp.R;
 import utils.date.DateUtil;
-import utils.thread.ActionScheduler;
 import utils.web.HttpsTrustManager;
 
 /**
@@ -36,83 +36,83 @@ public class PamelaActivity extends Activity {
     private final int updateRate = 15;
     private final String url ="https://urlab.be/api/space/pamela/";
 
-    private static ActionScheduler mainThreadScheduler = null;
+
+    @Override
+    protected void onCreate(Bundle savedInstance) {
+        super.onCreate(savedInstance);
+        refresh();
+    }
 
     @Override
     protected void onResume() {
         super.onResume();
+        refresh();
+    }
+
+    public void onClick(View v) {
+        refresh();
+    }
+
+    protected void refresh() {
 
         final Activity activity = this;
 
         HttpsTrustManager.allowAllSSL();
 
-        if (PamelaActivity.mainThreadScheduler!=null) {
-            mainThreadScheduler.cancel();
-            mainThreadScheduler = null;
-        }
+        RequestQueue queue = Volley.newRequestQueue(activity);
 
-        mainThreadScheduler = new ActionScheduler() {
-            @Override
-            protected void handler() {
-                RequestQueue queue = Volley.newRequestQueue(activity);
-
-                // Request a string response from the provided URL.
-                JsonObjectRequest stringRequest = new JsonObjectRequest(Request.Method.GET, url,
-                        new Response.Listener<JSONObject>() {
-                            @Override
-                            public void onResponse(JSONObject response) {
-                                activity.setContentView(R.layout.pamela_main);
-
-                                final TextView counterTextView = (TextView) activity.findViewById(R.id.counter);
-                                final ListView memberList = (ListView) activity.findViewById(R.id.memberList);
-                                final ProgressBar progressBar = (ProgressBar) activity.findViewById(R.id.updateProgressBar);
-
-                                try {
-                                    final Date date = DateUtil.fromString(response.getString("last_updated"), "yyyy-MM-dd'T'HH:mm:ss.SSS");
-
-                                    progressBar.setProgress(0);
-                                    ObjectAnimator animation = ObjectAnimator.ofInt(progressBar, "progress", 100);
-                                    animation.setDuration(updateRate*1000);
-                                    animation.setInterpolator(new LinearInterpolator());
-                                    animation.start();
-
-                                    // Update Present Users field
-                                    Integer nbUsers = response.getJSONArray("users").length();
-                                    counterTextView.setText(Integer.toString(nbUsers));
-
-                                    // Update the Member List view
-                                    if (nbUsers>0) {
-                                        memberList.setVisibility(View.VISIBLE);
-                                        List<Member > memberArray = new ArrayList<Member>();
-                                        for (int i = 0; i < response.getJSONArray("users").length(); ++i) {
-                                            JSONObject memberJSON = (JSONObject) response.getJSONArray("users").get(i);
-                                            Member aMember = new Member(memberJSON.getBoolean("has_key"),memberJSON.getString("username"),memberJSON.getString("gravatar"));
-                                            memberArray.add(i, aMember);
-                                        }
-                                        final MemberListAdapter adapter = new MemberListAdapter(activity, memberArray);
-                                        memberList.setAdapter(adapter);
-                                    } else {
-                                        memberList.setVisibility(View.INVISIBLE);
-                                    }
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                } catch (ParseException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }, new Response.ErrorListener() {
+        // Request a string response from the provided URL.
+        JsonObjectRequest stringRequest = new JsonObjectRequest(Request.Method.GET, url,
+                new Response.Listener<JSONObject>() {
                     @Override
-                    public void onErrorResponse(VolleyError error) {
-                        activity.setContentView(R.layout.pamela_error);
+                    public void onResponse(JSONObject response) {
+                        activity.setContentView(R.layout.pamela_main);
+
+                        final TextView counterTextView = (TextView) activity.findViewById(R.id.counter);
+                        final ListView memberList = (ListView) activity.findViewById(R.id.memberList);
+                        final ProgressBar progressBar = (ProgressBar) activity.findViewById(R.id.updateProgressBar);
+
+                        try {
+                            final Date date = DateUtil.fromString(response.getString("last_updated"), "yyyy-MM-dd'T'HH:mm:ss.SSS");
+
+                            progressBar.setProgress(0);
+                            ObjectAnimator animation = ObjectAnimator.ofInt(progressBar, "progress", 100);
+                            animation.setDuration(updateRate*1000);
+                            animation.setInterpolator(new LinearInterpolator());
+                            animation.start();
+
+                            // Update Present Users field
+                            Integer nbUsers = response.getJSONArray("users").length();
+                            counterTextView.setText(Integer.toString(nbUsers));
+
+                            // Update the Member List view
+                            if (nbUsers>0) {
+                                memberList.setVisibility(View.VISIBLE);
+                                List<Member > memberArray = new ArrayList<Member>();
+                                for (int i = 0; i < response.getJSONArray("users").length(); ++i) {
+                                    JSONObject memberJSON = (JSONObject) response.getJSONArray("users").get(i);
+                                    Member aMember = new Member(memberJSON.getBoolean("has_key"),memberJSON.getString("username"),memberJSON.getString("gravatar"));
+                                    memberArray.add(i, aMember);
+                                }
+                                final MemberListAdapter adapter = new MemberListAdapter(activity, memberArray);
+                                memberList.setAdapter(adapter);
+                            } else {
+                                memberList.setVisibility(View.INVISIBLE);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
                     }
-                });
-                // Add the request to the RequestQueue.
-                queue.add(stringRequest);
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                activity.setContentView(R.layout.pamela_error);
             }
-        };
-        mainThreadScheduler.schedule(updateRate * 1000);
-
-
+        });
+        // Add the request to the RequestQueue.
+        queue.add(stringRequest);
     }
 
 }

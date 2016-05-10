@@ -1,5 +1,6 @@
 package be.urlab.Urlapp.Calendar;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
@@ -115,6 +116,7 @@ public class CalendarActivity extends AppCompatActivity
 
         ListView eventsListView = (ListView) this.findViewById(R.id.eventsListView);
         eventsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @TargetApi(Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Event anEvent = (Event) parent.getItemAtPosition(position);

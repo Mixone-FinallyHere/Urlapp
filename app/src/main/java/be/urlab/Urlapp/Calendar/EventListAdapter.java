@@ -1,8 +1,10 @@
 package be.urlab.Urlapp.Calendar;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +31,7 @@ public class EventListAdapter extends ArrayAdapter<Event> {
         public ImageDownloader(ImageView bmImage) {
             super(bmImage);
         }
+        @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
         @Override
         protected void onPostExecute(Bitmap result) {
             super.onPostExecute(result);
@@ -74,11 +77,12 @@ public class EventListAdapter extends ArrayAdapter<Event> {
         this.objects = objects;
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View rowView = inflater.inflate(R.layout.event_item, parent, false);
-        Event anEvent = (Event) this.objects.get(position);
+        Event anEvent = this.objects.get(position);
         TextView titleView = (TextView) rowView.findViewById(R.id.title);
         TextView placeView = (TextView) rowView.findViewById(R.id.place);
         TextView dateView = (TextView) rowView.findViewById(R.id.date);
